@@ -3,21 +3,13 @@ import AddFishForm from './AddFishForm';
 import base from '../base';
 
 class Inventory extends React.Component {
-  constructor(){
-    super();
-    this.renderInventory = this.renderInventory.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.renderLogin = this.renderLogin.bind(this);
-    this.authenticate = this.authenticate.bind(this);
-    this.authHandler = this.authHandler.bind(this);
-    this.logout = this.logout.bind(this);
-    this.state = {
-      uid: null,
-      owner: null
-    }
-  }
 
-  componentDidMount(){
+  state = {
+    uid: null,
+    owner: null
+  };
+
+  componentDidMount() {
     base.onAuth((user) => {
       if(user) {
         this.authHandler(null, {user});
@@ -25,49 +17,49 @@ class Inventory extends React.Component {
     });
   }
 
-  handleChange(e,key) {
+  handleChange = (e,key) => {
     const fish = this.props.fishes[key];
     const updatedFish = {
       ...fish,
       [e.target.name]: e.target.value
     }
     this.props.updateFish(key,updatedFish);
-  }
+  };
 
-  authenticate(provider) {
+  authenticate = (provider) => {
     base.authWithOAuthPopup(provider, this.authHandler);
-  }
+  };
 
-  logout() {
+  logout = () => {
     base.unauth();
     this.setState({
       uid: null
     });
-  }
+  };
 
-  authHandler(err, authData) {
+  authHandler = (err, authData) => {
     console.log(authData);
     if(err) {
       console.error(err);
       return;
-    }
+  };
 
-    const storeRef = base.database().ref(this.props.storeId);
-    storeRef.once('value', (snapshot) => {
-      const data = snapshot.val() || {};
-      if(!data.owner){
-        storeRef.set({
-          owner: authData.user.uid
-        });
-      }
-      this.setState({
-        uid: authData.user.uid,
-        owner: data.owner || authData.user.uid
-      })
-    });
+  const storeRef = base.database().ref(this.props.storeId);
+  storeRef.once('value', (snapshot) => {
+    const data = snapshot.val() || {};
+    if(!data.owner){
+      storeRef.set({
+        owner: authData.user.uid
+      });
+    }
+    this.setState({
+      uid: authData.user.uid,
+      owner: data.owner || authData.user.uid
+    })
+   });
   }
 
-  renderLogin() {
+  renderLogin = () => {
     return (
       <nav className="login">
         <h2>Inventory</h2>
@@ -83,9 +75,9 @@ class Inventory extends React.Component {
         </button>
       </nav>
     )
-  }
+  };
 
-  renderInventory(key) {
+  renderInventory = (key) => {
     const fish = this.props.fishes[key];
     return (
       <div className="fish-edit" key={key}>
@@ -111,9 +103,10 @@ class Inventory extends React.Component {
         <button onClick={() => this.props.removeFish(key)}>Remove Fish</button>
       </div>
     )
-  }
+  };
+
   render() {
-    const logout = <button onClick={() => this.logout()}>Log Out</button>;
+    const logout = <button onClick={() => this.logout()}>Log Out 🔑</button>;
 
     if(!this.state.uid){
       return (
@@ -132,11 +125,11 @@ class Inventory extends React.Component {
 
     return (
       <div>
-        <h2>Inventory</h2>
+        <h2>Inventory 🐟 </h2>
         {logout}
         {Object.keys(this.props.fishes).map(this.renderInventory)}
         <AddFishForm addFish={this.props.addFish}/>
-        <button onClick={this.props.loadSamples}>Load Sample Fish</button>
+        <button onClick={this.props.loadSamples}>Load Sample 🐠</button>
       </div>
     )
   }
